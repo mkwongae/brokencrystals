@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-mailcatcher
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ .Release.Name }}-mailcatcher
+    app.kubernetes.io/instance: {{ .Release.Name }}-mailcatcher
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-mailcatcher
+      app.kubernetes.io/instance: {{ .Release.Name }}-mailcatcher
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/instance: {{ .Release.Name }}-mailcatcher
+        app: {{ .Release.Name }}-mailcatcher
+    spec:
+      containers:
+        - name: mailcatcher
+          image: sj26/mailcatcher
+      restartPolicy: Always

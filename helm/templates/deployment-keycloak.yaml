@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-keycloak
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ .Release.Name }}-keycloak
+    app.kubernetes.io/instance: {{ .Release.Name }}-keycloak
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-keycloak
+      app.kubernetes.io/instance: {{ .Release.Name }}-keycloak
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/instance: {{ .Release.Name }}-keycloak
+        app: {{ .Release.Name }}-keycloak
+    spec:
+      containers:
+        - name: keycloak
+          image: quay.io/keycloak/keycloak:16.1.1
+          resources:
+            requests:
+              cpu: 200m
+              memory: 500Mi
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 120
+            periodSeconds: 30
+          env:
+            - name: DB_VENDOR
+              value: "POSTGRES"
+            - name: DB_ADDR
+              value: "{{ .Release.Name }}-kc-db.{{ .Release.Namespace }}.svc.cluster.local"
+            - name: DB_PORT
+              value: "5432"
+            - name: DB_DATABASE
+              value: "keycloak"
+            - name: DB_SCHEMA
+              value: "public"
+            - name: DB_PASSWORD
+              value: "password"
+            - name: KEYCLOAK_USER
+              value: "admin"
+            - name: KEYCLOAK_PASSWORD
+              value: "Pa55w0rd"
+            - name: KEYCLOAK_IMPORT
+              value: "/opt/jboss/keycloak/imports/realm-export.json -Dkeycloak.profile.feature.upload_scripts=enabled"
+            - name: PROXY_ADDRESS_FORWARDING
+              value: "true"
+            - name: KEYCLOAK_FRONTEND_URL
+              value: "https://auth-{{ .Values.ingress.url }}/auth/"
+          volumeMounts:
+          - name: brokencrystals-keycloak
+            mountPath: /opt/jboss/keycloak/imports/realm-export.json
+            subPath: realm-export.json
+            readOnly: true
+      restartPolicy: Always
+
+      volumes:
+      - name: brokencrystals-keycloak
+        configMap:
+          name: brokencrystals-keycloak

@@ -1,0 +1,5 @@
+ingress:
+  url: "bc-test.fonlab.home"
+  cert: "brokencrystals-tls"
+images: 
+  main: v1
