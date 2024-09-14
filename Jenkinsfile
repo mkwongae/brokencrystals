@@ -21,15 +21,16 @@ pipeline {
                 git branch: 'stable', url: 'https://github.com/mkwongae/brokencrystals.git'
             }
         }
-        // stage("SonarQube Analysis") {
-        //     steps {
-        //         script {
-        //             withSonarQubeEnv(credentialsId: 'sonarqube-jenkins') {
-                    
-        //             }
-        //         }
-        //     }
-        // }
+        stage("SonarQube Analysis") {
+            steps {
+                script {
+                    scannerHome = tool 'sonarqube'
+                }
+                withSonarQubeEnv(installationName: 'sonarqube', credentialsId: 'sonarqube-jenkins') {
+                    sh "${scannerHome}/bin/sonar-scanner"
+                }
+            }
+        }
         stage("Build and Push Docker Image") {
             steps {
                 script {
