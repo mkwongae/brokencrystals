@@ -1,6 +1,6 @@
 pipeline {
     agent {
-        label "agent1"
+        label "built-in"
     }
     environment {
         APP_NAME = "brokencrystals"
@@ -8,7 +8,7 @@ pipeline {
         DOCKER_USER = "mkwongae"
         DOCKER_PASS = "dockerhub-jenkins"
         IMAGE_NAME = "${DOCKER_USER}/${APP_NAME}"
-        IAMGE_TAG = "${RELEASE}-${BUILD_NUMBER}"
+        IMAGE_TAG = "${RELEASE}-${BUILD_NUMBER}"
     }
     stages {
         stage("Cleanup Workspace") {
@@ -34,7 +34,7 @@ pipeline {
             steps {
                 script {
                     docker.withRegistry('', DOCKER_PASS) {
-                        docker_image = docker.build "${IMAGE_NAME}"
+                        docker_image = docker.build("${IMAGE_NAME}")
                     }
 
                     docker.withRegistry('', DOCKER_PASS) {
