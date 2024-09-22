@@ -55,5 +55,13 @@ pipeline {
                 }
             }
         }
+        stage("Trivy Image Scan") {
+            steps {
+                script {
+                    def trivyOutput = sh(script: "trivy image ${docker_image.id}", returnStdout: true).trim()
+                    println trivyOutput
+                }
+            }
+        }
     }
 }
