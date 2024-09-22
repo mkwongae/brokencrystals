@@ -25,8 +25,10 @@ pipeline {
         }
         stage('Semgrep Scan') {
             steps {
-                sh 'pip3 install semgrep'
-                sh 'semgrep ci'
+                script {
+                    sh 'pip3 install semgrep'
+                    sh 'semgrep ci'
+                }
             }
         }
         stage("SonarQube Analysis") {
