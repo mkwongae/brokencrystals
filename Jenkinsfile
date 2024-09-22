@@ -9,6 +9,8 @@ pipeline {
         DOCKER_PASS = "dockerhub-jenkins"
         IMAGE_NAME = "${DOCKER_USER}/${APP_NAME}"
         IMAGE_TAG = "${RELEASE}-${BUILD_NUMBER}"
+        SEMGREP_APP_TOKEN = credentials('SEMGREP_APP_TOKEN')
+        SEMGREP_PR_ID = "${env.CHANGE_ID}"
     }
     stages {
         stage("Cleanup Workspace") {
@@ -19,6 +21,12 @@ pipeline {
         stage("Checkout from Git") {
             steps {
                 git branch: 'stable', url: 'https://github.com/mkwongae/brokencrystals.git'
+            }
+        }
+        stage('Semgrep Scan') {
+            steps {
+                sh 'pip3 install semgrep'
+                sh 'semgrep ci'
             }
         }
         stage("SonarQube Analysis") {
